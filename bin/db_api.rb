@@ -14,8 +14,7 @@ con = Mysql.new 'localhost', 'root', 'sandisegota1995', 'albums'
 
 #start values setup
 default_value = ''
-topTableDef="asdasdasdads"
-
+loggedIn=false
 
 #selectquery 
 
@@ -115,10 +114,49 @@ get '/login' do
 	login="Please Login"
 	erb :login, :locals => {'login' => login}
 end
+
+post '/login' do
+	username = params[:username]
+	password = params[:password]
+        usernameTestQuery="SELECT EXISTS(SELECT * FROM korisnik WHERE (username = '#{username}'));"     
+        test=con.query(usernameTestQuery).fetch_row.join("\s")
+	if(test.to_i == 1)
+		#username OK
+		passTestQuery="SELECT password FROM korisnik WHERE (username = '#{username}')"
+		test=con.query(passTestQuery).fetch_row.join("\s")
+		if(password=test.to_s)
+			#Password OK
+			loggedIn=true;
+		else
+			msg="Wrong Password."
+		end
+	else
+		msg="Wrong username."
+	end	
+	erb :postlogin, :locals => {'msg' => msg}
+end
 get '/signup' do
-	signup="Please neter your information"
-	erb :login, :locals => {'signup' => signup}
-	
+	signup="Please enter your information"
+	erb :signup, :locals => {'signup' => signup}
+end
+
+post '/signup' do
+	username = params[:username]
+	password = params[:password]
+	#Username check
+	usernameTestQuery="SELECT EXISTS(SELECT * FROM korisnik WHERE (username = '#{username}'));"	
+	test=con.query(usernameTestQuery).fetch_row.join("\s")
+	if(test.to_i == 0)
+		userIDRes=con.query("SELECT MAX(userID) FROM korisnik")
+		userID = userIDRes.fetch_row.join("\s")
+		newUID=userID.to_i + 1
+		userNew="INSERT INTO korisnik VALUES ('" + newUID.to_s + "', '" + username + "', '" + password + "');"
+		con.query(userNew);
+		msg = "Congratulations #{username} you've created an account!"
+	else
+		msg= "That username is taken, please pick another."
+	end
+	erb :postsignup, :locals => {'msg' => msg}
 end
 get '/add' do
 	logged="You're Logged In!"
@@ -160,4 +198,5 @@ post '/add' do
 	erb :addRes, :locals => {'ident' => albumNew};
 	
 end
+
 
