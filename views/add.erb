@@ -1,0 +1,25 @@
+<%= logged %>
+<form action="/add" method="POST">
+	Please check if the album you want to add is in database on home page.
+	<br/>
+    	Musicians name: <input type="text" name="band" style="background-color: silver">
+    	<br/>
+        Musicians Location: <input type="text" name="location" style="background-color: silver">
+        <br/>
+	Number Of Members: <input type="text" name="members" style="background-color: silver">
+        <br/>
+	Album name: <input type="text" name="album" style="background-color: silver">
+    	<br/>
+	Date of Release:<br>
+	Day: <input type="number" name="day" min="1" max="31" style="background-color: silver">
+	Month: <input type="number" name="month" min="1" max="12" style="background-color: silver">
+	Year: <input type="number" name="year" min="2015" max="2050" style="background-color: silver">
+	<br/>
+	Genre: <input type="text" name="genre" style="background-color: silver">
+	<br/>
+	Subgenre: <input type="text" name="subGenre" style="background-color: silver">
+	<br/>	
+	Number of Songs: <input type="text" name="nofsongs" style="background-color: silver">
+	<br/>
+    	<input type="submit">
+</form>

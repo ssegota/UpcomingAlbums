@@ -49,8 +49,14 @@ end
 
 #Landing page ERB
 get '/' do
-	
-   	erb :form,:locals => {'top' => topTableDef}	    
+	upcomingQuery="SELECT name, albumname, date FROM musician, album WHERE (authorID=bandID) ORDER BY date LIMIT 5"
+ 	upcomingResults=con.query(upcomingQuery)	
+   	n_rows=upcomingResults.num_rows
+	upcomingForPrint=""
+	upcomingResults.each_hash do |row|
+		upcomingForPrint+="<tr><td>" + row['name'] + "</td><td>" + row['albumname'] + "</td><td>" + row['date'] + "</td></tr>"
+	end
+	erb :form,:locals => {'top' => upcomingForPrint}	    
 end
 
 #POST ERB
@@ -79,5 +85,53 @@ post '/' do
 	
 end
 
+get '/login' do
+	login="Please Login"
+	erb :login, :locals => {'login' => login}
+end
+get '/signup' do
+	signup="Please neter your information"
+	erb :login, :locals => {'signup' => signup}
+	
+end
+get '/add' do
+	logged="You're Logged In!"
+	puts "add page reached"
+	erb :add, :locals => {'logged' => logged}
+end
 
+post '/add' do
+	                #Getting parameters from form
+        band = params[:band] || default_value
+        location = params[:location] || default_value
+        members = params[:members] || default_value
+        album = params[:album] || default_value
+        day = params[:day] || default_value
+        month = params[:month] || default_value
+        year = params[:year] || default_value
+        genre = params[:genre] || default_value
+        subGenre = params[:subGenre] || default_value
+        nofsongs = params[:nofsongs] || default_value
+        albumID = ""
+	bandID = ""
+	date = ""
+	date = year + "-" + month + "-" + day
+	albumIDRes=con.query("SELECT MAX(albumID) FROM album")
+        bandIDRes=con.query("SELECT MAX(bandID) FROM musician")
+        albumID = albumIDRes.fetch_row.join("\s")
+    	bandID = bandIDRes.fetch_row.join("\s")
+	newAlbumID=albumID.to_i + 1
+	newBandID=bandID.to_i + 1
+		
+	ident=newAlbumID.to_s + ' ' + newBandID.to_s + date.to_s
+	#insert musician
+	musician="INSERT INTO musician VALUES('" +  newBandID.to_s + "', '" + members.to_s.downcase + "', '" + location.to_s.downcase + "', '" + band.to_s.downcase + "');"
+
+	con.query(musician);
+	#insert album
+	albumNew="INSERT INTO album VALUES('" + newAlbumID.to_s + "', '" + newBandID.to_s + "', '" + genre.to_s.downcase + "', '" + subGenre.to_s.downcase + "', '"+nofsongs.to_s.downcase + "', '" + date.to_s  + "', '" + album.to_s.downcase+"');";
+	con.query(albumNew);
+	erb :addRes, :locals => {'ident' => albumNew};
+	
+end
 
