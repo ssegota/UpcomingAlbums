@@ -124,9 +124,12 @@ post '/login' do
 		#username OK
 		passTestQuery="SELECT password FROM korisnik WHERE (username = '#{username}')"
 		test=con.query(passTestQuery).fetch_row.join("\s")
-		if(password=test.to_s)
+		puts test.to_s
+		puts password
+		if(password==test.to_s)
 			#Password OK
 			loggedIn=true;
+			msg="Sucesfull login.<br><a href=\"/add\">Click here to add an album.</a><br><a href=\"/vote\">Click here to give scores to musicians.</a>"
 		else
 			msg="Wrong Password."
 		end
@@ -199,4 +202,39 @@ post '/add' do
 	
 end
 
+get '/vote' do
+	vote = "Input your username, name of musician you want to vote for and a grade (from 1 to 5)"
+	erb :vote, :locals => {'vote' => vote};
+end
 
+post '/vote' do
+	username = params[:username]
+	musician = params[:musician]
+	musician = musician.downcase
+	grade = params[:vote]
+	#check if username exists
+        usernameTestQuery="SELECT EXISTS(SELECT * FROM korisnik WHERE (username = '#{username}'));"
+        test=con.query(usernameTestQuery).fetch_row.join("\s")
+	puts "TEST" + test
+	if(test.to_i == 1)
+		#username OK	
+		#get userID from username
+		userID=con.query("SELECT userID FROM korisnik WHERE (username = '#{username}');").fetch_row.join("\s")
+			#check if musician exists
+			if(con.query("SELECT EXISTS(SELECT * FROM musician WHERE (name='#{musician}'));").fetch_row.join("\s").to_i==1)
+				#get bandID from musician
+				bandID=con.query("SELECT bandID from musician where (name='#{musician}');").fetch_row.join("\s")
+				#Create input query
+				voteQuery="INSERT INTO vote VALUES(" + bandID.to_s + "," + userID.to_s + "," + grade.to_s + ");"
+				puts "VOTEQUERY: " + voteQuery;
+				#insert into table
+        			con.query(voteQuery)
+				msg = "sucessfuly inputed vote for #{musician} by #{username}"	
+			else
+				msg="Musician doesn't exist."
+			end
+	else
+		msg="Wrong Username."
+	end
+	erb :postvote, :locals => {'msg' => msg}
+end
