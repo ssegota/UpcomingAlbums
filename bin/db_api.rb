@@ -10,7 +10,7 @@ set :public_folder, "static"
 set :views, "views"
 
 #mysql setup
-con = Mysql.new 'localhost', 'root', 'sandisegota1995', 'albums'
+con = Mysql.new 'localhost', 'test', 'A*nz39@Ij', 'albums'
 
 #start values setup
 default_value = ''
@@ -63,14 +63,29 @@ end
 
 #Landing page ERB
 get '/' do
-	upcomingQuery="SELECT name, albumname, date FROM musician, album WHERE (authorID=bandID) ORDER BY date LIMIT 5"
- 	upcomingResults=con.query(upcomingQuery)	
+        timenow=Time.now
+	delDate=timenow - (7*86400)
+	delDate=timenow.strftime("%Y-%m-%d")
+	con.query("DELETE FROM album WHERE (date<'#{delDate}');")
+        timenow=timenow.strftime("%Y-%m-%d")
+	upcomingQuery="SELECT name, albumname, date FROM musician, album WHERE (authorID=bandID) AND (date>='#{timenow}') ORDER BY date LIMIT 5;"
+ 	puts "UPCOMING" + upcomingQuery
+	upcomingResults=con.query(upcomingQuery)	
    	n_rows=upcomingResults.num_rows
-	upcomingForPrint=""
+	upcomingForPrint="<b>Coming Next</b><br><table><tr><td><i>Musician</i></td><td><i>Album</i></td><td><i>Date</i></td></tr>"
 	upcomingResults.each_hash do |row|
-		upcomingForPrint+="<tr><td>" + row['name'] + "</td><td>" + row['albumname'] + "</td><td>" + row['date'] + "</td></tr>"
+		upcomingForPrint+="<tr><td>" + row['name'].split.map(&:capitalize)*' ' + "</td><td>" + row['albumname'].split.map(&:capitalize)*' ' + "</td><td>" + row['date'] + "</td></tr>"
 	end
-	erb :form,:locals => {'top' => upcomingForPrint}	    
+	topQuery="SELECT name, albumname, date, ROUND(AVG(rating),2) AS avg FROM vote, musician,album WHERE (vote.bandID=musician.bandID) AND (authorid=musician.bandID) GROUP BY albumname ORDER BY avg DESC LIMIT 5;"
+	topResults=con.query(topQuery)
+	upcomingForPrint+="</table><br><b>Top Rated Musicians Albums</b><br><table>"
+	upcomingForPrint+="<tr><td><i>Musician</i></td><td><i>Album</i></td><td><i>Rating</i></td><td><i>Date</i></td></tr>"
+	topResults.each_hash do |row|
+		upcomingForPrint+="<tr><td>" + row['name'].split.map(&:capitalize)*' ' + "</td><td>" + row['albumname'].split.map(&:capitalize)*' ' + "</td><td>" +row['avg'] + "</td><td>"+ row['date'] + "</td></tr>"	
+	end
+	upcomingForPrint+="</table>"
+	erb :form,:locals => {'upcoming' => upcomingForPrint}	    
+	#erb :form,:locals => {'top' => topForPrint}
 end
 
 #POST ERB
@@ -162,7 +177,7 @@ post '/signup' do
 	erb :postsignup, :locals => {'msg' => msg}
 end
 get '/add' do
-	logged="You're Logged In!"
+	logged="."
 	puts "add page reached"
 	erb :add, :locals => {'logged' => logged}
 end

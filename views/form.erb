@@ -1,24 +1,24 @@
 <div style="position:absolute; left: 0px; width:50%; height:90%; background-color:rgba(100,100,100,0);">
-	<table>
-		<%= top %>
-	</table>
+		<%= upcoming%>
 </div>
 <div style="position:absolute; right: 0px; width:50%; height:90%; background-color:rgba(255,100,100,0);">
 <div id="VERTSPACER" style="height: 20%; width 40%"></div>
 
 <form action="/" method="POST">
-    	Band name: <input type="text" name="band" style="background-color: silver" >
-    	<br/>
-    	Album name: <input type="text" name="album" style="background-color: silver">
-    	<br/>
-    	Location: <input type="text" name="location" style="background-color: silver">
-    	<br/>
-	Coming out withing(DAYS): <input type="text" name="outTime" style="background-color: silver">
-	<br/>
-	Genre: <input type="text" name="genre" style="background-color: silver">
-	<br/>
-	Subgenre: <input type="text" name="subGenre" style="background-color: silver">
-	<br/>	
-    	<input type="submit">
+<table>
+    	<tr><td>Band name:</td><td> <input type="text" name="band" style="background-color: silver" ></td></tr>
+    	
+    	<tr><td>Album name:</td><td> <input type="text" name="album" style="background-color: silver"></td></tr>
+    	
+    	<tr><td>Location:</td><td> <input type="text" name="location" style="background-color: silver"></td></tr>
+    	
+	<tr><td>Out in (days):</td><td> <input type="number" name="outTime" style="background-color: silver"></td></tr>
+	
+	<tr><td>Genre:</td><td> <input type="text" name="genre" style="background-color: silver"></td></tr>
+	
+	<tr><td>Subgenre:</td><td> <input type="text" name="subGenre" style="background-color: silver"></td></tr>
+	
+    	<tr><td></td><td><input type="submit"></td></tr>
+</table>
 </form>
 <div>
