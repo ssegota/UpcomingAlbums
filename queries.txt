@@ -1,2 +1,0 @@
-SELECT name, albumname, genre, subgenre, nofsongs, date FROM album, musician WHERE (authorID=bandID) AND (authorID=(SELECT bandID from musician WHERE name='led zeppelin')); 
-
